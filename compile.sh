@@ -1,2 +1,3 @@
 gcc -c que.c
-gcc BTree.c que.o
+gcc -c BTree.c
+gcc main.c que.o BTree.o
