@@ -10,54 +10,75 @@ typedef struct QueNode
     struct BTreeNode *Data;
 } QueNode;
 
-
-QueNode *QueInit()
+typedef struct EdgeNode
 {
-    QueNode *Root = (QueNode *)malloc(sizeof(QueNode));
-    Root->next = NULL;
-    
-    return Root;
+    struct QueNode *head;
+    struct QueNode *tail;
+} EdgeNode;
+
+EdgeNode que_init()
+{
+    EdgeNode edge;
+    edge.head = NULL;
+    edge.tail = NULL;
+
+    return edge;
 };
 
-int QueAppend(QueNode *Root, BTreeNode *tail)
+int que_append(EdgeNode *edge, BTreeNode *que_data)
 {
-    QueNode *tmp = Root; 
-    while (tmp->next != NULL){
-        tmp = tmp->next;
+
+    QueNode *que_element = (QueNode *)malloc(sizeof(QueNode));
+
+    if (edge->head == NULL) // 큐가 비어있는 경우
+    {
+        QueNode *que_element = (QueNode *)malloc(sizeof(QueNode));
+        que_element->Data = que_data;
+        que_element->next = NULL;
+
+        edge->head = que_element;
+        edge->tail = que_element;
+
+        return 0;
     }
+    else
+    {
 
-    QueNode *end = (QueNode *)malloc(sizeof(QueNode));
-    end->Data = tail;
-    end->next = NULL;
+        que_element->Data = que_data;
+        que_element->next = NULL;
 
-    tmp->next = end;
+        edge->tail->next = que_element;
 
-    return 0;
-}
+        edge->tail = que_element;
 
-QueNode *QuePop(QueNode *Root)
-{
-    if (Root->next != NULL){
-        QueNode *First = Root->next;
-
-        QueNode *tmp = First->next;
-
-        Root->next = tmp;
-
-        return First;
-    }
-    else{
-        QueNode *tmp = (QueNode *)malloc(sizeof(QueNode));
-        tmp->Data->data = INIT_ROOT;
-        return tmp;
+        return 0;
     }
 }
 
-int MkEmptyQue(QueNode *Root){
-    QueNode *tmp = NULL;
-    while (Root->next != NULL){
-        tmp = QuePop(Root);
-        free(tmp);
+QueNode *que_pop(EdgeNode *edge)
+{
+    if (edge->head == NULL) // 큐가 비어있는 경우
+    {
+        return NULL;
     }
-    return 0;
+    else
+    {
+        QueNode *poped_node = edge->head;
+
+        if (poped_node->next != NULL) // 큐에 노드가 남은 경우
+        {
+            edge->head = poped_node->next;
+
+            poped_node->next = NULL;
+
+            return poped_node;
+        }
+        else // 더이상 큐에 남은 노드가 없는 경우
+        {
+            edge->head = NULL;
+            edge->tail = NULL;
+
+            return poped_node;
+        }
+    }
 }

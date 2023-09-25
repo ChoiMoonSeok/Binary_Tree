@@ -1,171 +1,109 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <assert.h>
+
 #include "Node.h"
 #include "que.h"
-#define INIT_ROOT -2147483647
 
-BTreeNode *BTreeInit()
+
+typedef struct RootNode
 {
-    BTreeNode *Root = (BTreeNode *)malloc(sizeof(BTreeNode));
-    Root->data = INIT_ROOT;
-    Root->LeftNode = NULL;
-    Root->RightNode = NULL;
-    return Root;
+    BTreeNode *Root;
+} RootNode;
+
+RootNode b_tree_init()
+{
+    RootNode root;
+    root.Root = NULL;
+
+    return root;
 }
 
-int BTreeAdd(BTreeNode *Root, int data)
+int b_tree_add(RootNode *tree_root, int data)
 {
+    BTreeNode *tree_element = (BTreeNode *)malloc(sizeof(BTreeNode));
+    tree_element->data = data;
+    tree_element->LeftNode = NULL;
+    tree_element->RightNode = NULL;
 
-    if (Root->data == INIT_ROOT)
+    if (tree_root->Root == NULL)
     {
-        Root->data = data;
+
+        tree_root->Root = tree_element;
+
         return 0;
     }
-    QueNode *mothers = QueInit();
-    BTreeNode *Data = (BTreeNode *)malloc(sizeof(BTreeNode));
-    Data->data = data;
-    Data->LeftNode = NULL;
-    Data->RightNode = NULL;
+    else {
+        
+        BTreeNode *root_node;
 
-    // BFS 활용
-    QueAppend(mothers, Root);
-    QueNode *tmp;
-    while (1)
-    {
-        tmp = QuePop(mothers);
-        if (tmp->Data->LeftNode == NULL)
-        {
-            tmp->Data->LeftNode = Data;
-            break;
-        }
-        else if (tmp->Data->RightNode == NULL)
-        {
-            tmp->Data->RightNode = Data;
-            break;
-        }
-        else
-        {
-            QueAppend(mothers, tmp->Data->LeftNode);
-            QueAppend(mothers, tmp->Data->RightNode);
+        root_node = tree_root->Root;
+        printf("root : %d\n", root_node->data);
+        while (1){
+            // root node보다 작을 때
+            printf("%d : %d\n", data, root_node->data);
+            if (root_node->data > data){ 
+                if (root_node->LeftNode != NULL){
+
+                    // root node 보다 작고, left node보다 클 때
+                    if (root_node->LeftNode->data > data){ 
+                        tree_element->RightNode = root_node->LeftNode;
+                        root_node->LeftNode = tree_element;
+                        break;
+                    }
+                    else{
+                        root_node = root_node->LeftNode;
+                    }
+                }
+                else{ 
+                    root_node->LeftNode = tree_element;
+                    break;
+                }
+            }
+            // root node보다 클 때 
+            else{ 
+
+                // root node보다 크고, right node 보다 작을 때
+                if (root_node->RightNode != NULL){
+                    if (root_node->RightNode->data > data){
+                        tree_element->LeftNode = root_node->RightNode;
+                        root_node->RightNode = tree_element;
+                        break;
+                    }
+                    else{
+                        root_node = root_node->RightNode;
+                    }
+                }
+                else{
+                    root_node->RightNode = tree_element;
+                    break;
+                }
+            }
         }
     }
 
     return 0;
 }
 
-BTreeNode *BTreeSearch(BTreeNode *Root, int data){
-
-    
-    if (Root->data == data){
-        return Root;
-    }
-    else{
-        QueNode *que = QueInit();
-        QueAppend(que, Root);
-        BTreeNode *Destination = NULL;
-
-        QueNode *tmp = NULL;
-        int BkPoint = 0;
-        while (que->next != NULL){
-            tmp = QuePop(que);
-            if (tmp->Data->LeftNode->data == data){
-                Destination = tmp->Data->LeftNode;
-                BkPoint = 1;
-                break;
-            }
-            else if (tmp->Data->RightNode->data == data){
-                Destination = tmp->Data->RightNode;
-                BkPoint = 1;
-                break;
-            }
-            else{
-                if (tmp->Data->LeftNode != NULL){
-                    QueAppend(que, tmp->Data->LeftNode);
-                }
-                if (tmp->Data->RightNode != NULL){
-                    QueAppend(que, tmp->Data->RightNode);
-                }
-            }
-            free(tmp);
-        }
-
-        return Destination;
-
-    }
-
-}
-
-int BTreeDel(BTreeNode *Root, int data)
+int main()
 {
 
-    QueNode *mothers = QueInit();
+    RootNode Tree = b_tree_init();
 
-    if (Root->data == data)
-    {
-        QueAppend(mothers, Root);
-        QueNode *children = QueInit();
-        QueNode *tmp = NULL;
-        while (mothers->next != NULL) {
-            tmp = QuePop(mothers);
-            if (tmp->Data->LeftNode != NULL)
-            {
-                QueAppend(mothers, tmp->Data->LeftNode);
-                QueAppend(children, tmp->Data->LeftNode);
-            }
-            if (tmp->Data->RightNode != NULL)
-            {
-                QueAppend(mothers, tmp->Data->RightNode);
-                QueAppend(children, tmp->Data->RightNode);
-            }
-            free(tmp);
-        }
-
-        free(Root);
-        Root = (BTreeNode *)malloc(sizeof(BTreeNode));
-        tmp = QuePop(children);
-        Root->data = tmp->Data->data;
-        Root->LeftNode = NULL;
-        Root->RightNode = NULL;
-
-        while (children->next != NULL){
-            tmp = QuePop(children);
-            BTreeAdd(Root, tmp->Data->data);
-        }
-
-        return 0;
-    }
-    else
-    {
-        QueNode *children = QueInit();
-        BTreeNode *Del = BTreeSearch(Root, data);
-
-        
-        QueAppend(mothers, Del);
-        QueNode *tmp = NULL;
-        while (mothers->next != NULL){
-            tmp = QuePop(mothers);
-            if (tmp->Data->LeftNode != NULL){
-                QueAppend(children, tmp->Data->LeftNode);
-                QueAppend(mothers, tmp->Data->LeftNode);
-            }
-            if (tmp->Data->RightNode != NULL){
-                QueAppend(children, tmp->Data->RightNode);
-                QueAppend(children, tmp->Data->RightNode);
-            }
-            free(tmp);
-        }
-
-        tmp = QuePop(children);
-        Del->data = tmp->Data->data;
-        free(tmp);
-
-        while (children->next != NULL){
-            tmp = QuePop(children);
-            BTreeAdd(Del, tmp->Data->data);
-            free(tmp);
-        }
-    }
+    b_tree_add(&Tree, 0);
+    printf("%d end\n", Tree.Root->data);
+    b_tree_add(&Tree, -1);
+    printf("%d end\n", Tree.Root->LeftNode->data);
+    b_tree_add(&Tree, 1);
+    printf("%d end\n", Tree.Root->RightNode->data);
+    b_tree_add(&Tree, 2);
+    printf("%d end\n", Tree.Root->RightNode->RightNode->data);
+    b_tree_add(&Tree, 10);
+    printf("%d end\n", Tree.Root->RightNode->RightNode->RightNode->data);
+    b_tree_add(&Tree, 8);
+    printf("%d end\n", Tree.Root->RightNode->RightNode->RightNode->data);
+    printf("%d\n", Tree.Root->RightNode->RightNode->RightNode->LeftNode->data);
 
     return 0;
 }

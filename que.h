@@ -7,7 +7,7 @@ typedef struct BTreeNode
     int data;
     struct BTreeNode *RightNode;
     struct BTreeNode *LeftNode;
-} BTreeNode; 
+} BTreeNode;
 #endif
 
 typedef struct QueNode
@@ -16,10 +16,14 @@ typedef struct QueNode
     struct BTreeNode *Data;
 } QueNode;
 
-QueNode *QueInit();
+typedef struct EdgeNode
+{
+    struct QueNode *head;
+    struct QueNode *tail;
+} EdgeNode;
 
-int QueAppend(QueNode *Root, BTreeNode *tail);
+EdgeNode que_init();
 
-QueNode *QuePop(QueNode *Root);
+int que_append(EdgeNode *edge, BTreeNode *que_data);
 
-int MkEmptyQue(QueNode *Root);
+QueNode *que_pop(EdgeNode *edge);
