@@ -1,43 +1,41 @@
 #include "BTree.h"
 
-int main(void)
+int main()
 {
 
-    BTreeNode *Root = BTreeInit();
-    for (int i = 0; i < 7; i++)
-    {
-        BTreeAdd(Root, i);
-    }
+    RootNode Tree = b_tree_init();
 
-    
-    printf("%d Root\n", Root->data);
-    printf("%d l\n", Root->LeftNode->data);
-    printf("%d r\n", Root->RightNode->data);
-    printf("%d l l\n", Root->LeftNode->LeftNode->data);
-    printf("%d l r\n", Root->LeftNode->RightNode->data);
-    printf("%d r l\n", Root->RightNode->LeftNode->data);
-    printf("%d r r\n", Root->RightNode->RightNode->data);
+    // case 1
+    b_tree_add(&Tree, 10);
+    printf("case 1\n %d\n\n", Tree.Root->data);
 
-    BTreeDel(Root, 0);
-    
-    printf("\nAfter Delete Root\n\n");
-    printf("%d Root\n", Root->data);
-    printf("%d l\n", Root->LeftNode->data);
-    printf("%d r\n", Root->RightNode->data);
-    printf("%d l l\n", Root->LeftNode->LeftNode->data);
-    printf("%d l r\n", Root->LeftNode->RightNode->data);
-    printf("%d r l\n", Root->RightNode->LeftNode->data);
+    // case 2
+    b_tree_add(&Tree, 5);
+    printf("case 2\n");
+    printf("%d\n", Tree.Root->data);
+    printf("%d\n\n", Tree.Root->LeftNode->data);
 
-    printf("\nSearch %d\n", BTreeSearch(Root, 5)->data);
+    // case 3
+    b_tree_add(&Tree, 15);
+    printf("case 3\n");
+    printf("%d\n", Tree.Root->data);
+    printf("%d %d\n\n", Tree.Root->LeftNode->data, Tree.Root->RightNode->data);
 
-    BTreeDel(Root, 3);
+    // case 4
+    b_tree_add(&Tree, 20);
+    printf("case 4\n");
+    printf("%d\n", Tree.Root->data);
+    printf("%d %d\n", Tree.Root->LeftNode->data, Tree.Root->RightNode->data);
+    printf("%d\n\n", Tree.Root->RightNode->RightNode->data);
 
-    printf("\nAfter Delete 3\n\n");
-    printf("%d Root\n", Root->data);
-    printf("%d l\n", Root->LeftNode->data);
-    printf("%d r\n", Root->RightNode->data);
-    printf("%d l l\n", Root->LeftNode->LeftNode->data);
-    printf("%d l r\n", Root->LeftNode->RightNode->data);
+    // case 5
+    b_tree_add(&Tree, 13);
+    printf("case 5\n");
+    printf("%d\n", Tree.Root->data);
+    printf("%d %d\n", Tree.Root->LeftNode->data, Tree.Root->RightNode->data);
+    printf("%d %d\n\n", Tree.Root->RightNode->LeftNode->data, Tree.Root->RightNode->RightNode->data);
+
+    //----------------------------------------------------------------------------------------------------
 
     return 0;
 }

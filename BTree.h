@@ -1,15 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "Node.h"
-#include "que.h"
-#define INIT_ROOT -2147483647
 
-BTreeNode *BTreeInit();
+typedef struct BTreeNode
+{
+    int data;
+    struct BTreeNode *RightNode;
+    struct BTreeNode *LeftNode;
+} BTreeNode;
 
-int BTreeAdd(BTreeNode *Root, int data);
+typedef struct RootNode
+{
+    BTreeNode *Root;
+} RootNode;
 
-BTreeNode *BTreeSearch(BTreeNode *Root, int data);
+RootNode b_tree_init();
 
-int BTreeDel(BTreeNode *Root, int data);
+int b_tree_add(RootNode *tree_root, int data);
 
+int b_tree_delete(RootNode *tree_root, int data);

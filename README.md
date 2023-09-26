@@ -1,17 +1,17 @@
 # Binary Tree Implementaion
-단순 이진트리로 구현.\
-따라서 정렬과 같은 부분은 구현되어 있지 않음.\
+이진 탐색 트리 구현\
+삽입, 삭제, 초기화만 구현되어 있음.\
+해당 구현의 경우 값이 동일한 데이터는 1회만 입력된다고 가정하고 구현
 
-## que.c & que.h
-이진 트리 탐색의 경우 BFS를 활용함.\
-따라서 BFS 구현에 필요한 Que를 구현한 부분
-
-## Node.h
-BTreeNode 구조체의 경우 que.c와 BTree.c의 구현에 모두 필요.\
-따라서 구조체만 분리하여 Node.h로 정의.
-
-## BTree.c & BTree.c
+## BTree.c & BTree.h
 이진 트리를 구현한 부분
 
 ## main.c
 이진트리를 구현하고 이를 테스트한 코드
+
+## Makefile
+make main 명령어로 실행\
+main.c를 컴파일하는 파일
+
+## b-tree Scenario
+b-tree 테스트 케이스를 기록한 pdf 파일

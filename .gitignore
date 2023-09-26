@@ -1,2 +1,8 @@
 *.o
 *.out
+main
+.vscode
+build
+CMakeFiles
+cmake_install.*
+CMakeCache.*

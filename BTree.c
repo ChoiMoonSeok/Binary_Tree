@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include <assert.h>
 
-#include "Node.h"
-#include "que.h"
-
+typedef struct BTreeNode
+{
+    int data;
+    struct BTreeNode *RightNode;
+    struct BTreeNode *LeftNode;
+} BTreeNode;
 
 typedef struct RootNode
 {
@@ -34,48 +36,54 @@ int b_tree_add(RootNode *tree_root, int data)
 
         return 0;
     }
-    else {
-        
+    else
+    {
+
         BTreeNode *root_node;
 
         root_node = tree_root->Root;
-        printf("root : %d\n", root_node->data);
-        while (1){
+        while (1)
+        {
             // root node보다 작을 때
-            printf("%d : %d\n", data, root_node->data);
-            if (root_node->data > data){ 
-                if (root_node->LeftNode != NULL){
+            if (root_node->data > data)
+            {
+                if (root_node->LeftNode != NULL)
+                {
 
                     // root node 보다 작고, left node보다 클 때
-                    if (root_node->LeftNode->data > data){ 
-                        tree_element->RightNode = root_node->LeftNode;
-                        root_node->LeftNode = tree_element;
-                        break;
+                    if (root_node->LeftNode->data < data)
+                    {
+                        root_node = root_node->RightNode;
                     }
-                    else{
+                    else
+                    {
                         root_node = root_node->LeftNode;
                     }
                 }
-                else{ 
+                else
+                {
                     root_node->LeftNode = tree_element;
                     break;
                 }
             }
-            // root node보다 클 때 
-            else{ 
+            // root node보다 클 때
+            else
+            {
 
                 // root node보다 크고, right node 보다 작을 때
-                if (root_node->RightNode != NULL){
-                    if (root_node->RightNode->data > data){
-                        tree_element->LeftNode = root_node->RightNode;
-                        root_node->RightNode = tree_element;
-                        break;
-                    }
-                    else{
+                if (root_node->RightNode != NULL)
+                {
+                    if (root_node->RightNode->data < data)
+                    {
                         root_node = root_node->RightNode;
                     }
+                    else
+                    {
+                        root_node = root_node->LeftNode;
+                    }
                 }
-                else{
+                else
+                {
                     root_node->RightNode = tree_element;
                     break;
                 }
@@ -86,24 +94,57 @@ int b_tree_add(RootNode *tree_root, int data)
     return 0;
 }
 
-int main()
+int b_tree_delete(RootNode *tree_root, int data)
 {
 
-    RootNode Tree = b_tree_init();
+    BTreeNode *root_node = NULL;
+    BTreeNode *child_node = tree_root->Root;
+    while (1)
+    {
+        if (child_node->data > data)
+        {
+            root_node = child_node;
+            child_node = child_node->LeftNode;
+        }
+        else if (child_node->data < data)
+        {
+            root_node = child_node;
+            child_node = child_node->RightNode;
+        }
+        else
+        {
+            BTreeNode *del = child_node;
 
-    b_tree_add(&Tree, 0);
-    printf("%d end\n", Tree.Root->data);
-    b_tree_add(&Tree, -1);
-    printf("%d end\n", Tree.Root->LeftNode->data);
-    b_tree_add(&Tree, 1);
-    printf("%d end\n", Tree.Root->RightNode->data);
-    b_tree_add(&Tree, 2);
-    printf("%d end\n", Tree.Root->RightNode->RightNode->data);
-    b_tree_add(&Tree, 10);
-    printf("%d end\n", Tree.Root->RightNode->RightNode->RightNode->data);
-    b_tree_add(&Tree, 8);
-    printf("%d end\n", Tree.Root->RightNode->RightNode->RightNode->data);
-    printf("%d\n", Tree.Root->RightNode->RightNode->RightNode->LeftNode->data);
+            if (child_node->LeftNode != NULL)
+            {
+                BTreeNode *upper_child_node = NULL;
+                while (child_node->LeftNode != NULL)
+                {
+                    upper_child_node = child_node;
+                    child_node = child_node->LeftNode;
+                }
+
+                upper_child_node->LeftNode = child_node->RightNode;
+                free(del);
+                break;
+            }
+            else
+            {
+                if (root_node->data > data)
+                {
+                    root_node->LeftNode = child_node->RightNode;
+                    free(del);
+                    break;
+                }
+                else
+                {
+                    root_node->RightNode = child_node->RightNode;
+                    free(del);
+                    break;
+                }
+            }
+        }
+    }
 
     return 0;
 }
