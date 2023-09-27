@@ -14,7 +14,7 @@ typedef struct RootNode
     BTreeNode *Root;
 } RootNode;
 
-RootNode b_tree_init();
+RootNode *b_tree_init();
 
 int b_tree_add(RootNode *tree_root, int data);
 

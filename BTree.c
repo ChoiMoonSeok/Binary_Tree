@@ -14,10 +14,10 @@ typedef struct RootNode
     BTreeNode *Root;
 } RootNode;
 
-RootNode b_tree_init()
+RootNode *b_tree_init()
 {
-    RootNode root;
-    root.Root = NULL;
+    RootNode *root = (RootNode *)malloc(sizeof(RootNode));
+    root->Root = NULL;
 
     return root;
 }
@@ -49,16 +49,7 @@ int b_tree_add(RootNode *tree_root, int data)
             {
                 if (root_node->LeftNode != NULL)
                 {
-
-                    // root node 보다 작고, left node보다 클 때
-                    if (root_node->LeftNode->data < data)
-                    {
-                        root_node = root_node->RightNode;
-                    }
-                    else
-                    {
-                        root_node = root_node->LeftNode;
-                    }
+                    root_node = root_node->LeftNode;
                 }
                 else
                 {
@@ -69,18 +60,9 @@ int b_tree_add(RootNode *tree_root, int data)
             // root node보다 클 때
             else
             {
-
-                // root node보다 크고, right node 보다 작을 때
                 if (root_node->RightNode != NULL)
                 {
-                    if (root_node->RightNode->data < data)
-                    {
-                        root_node = root_node->RightNode;
-                    }
-                    else
-                    {
-                        root_node = root_node->LeftNode;
-                    }
+                    root_node = root_node->RightNode;
                 }
                 else
                 {
@@ -96,55 +78,118 @@ int b_tree_add(RootNode *tree_root, int data)
 
 int b_tree_delete(RootNode *tree_root, int data)
 {
+    BTreeNode *root_node[2] = {NULL};
+    BTreeNode *leaf_node = NULL;
+    root_node[1] = tree_root->Root;
 
-    BTreeNode *root_node = NULL;
-    BTreeNode *child_node = tree_root->Root;
     while (1)
     {
-        if (child_node->data > data)
+        if (root_node[1] != NULL)
         {
-            root_node = child_node;
-            child_node = child_node->LeftNode;
-        }
-        else if (child_node->data < data)
-        {
-            root_node = child_node;
-            child_node = child_node->RightNode;
-        }
-        else
-        {
-            BTreeNode *del = child_node;
-
-            if (child_node->LeftNode != NULL)
+            if (root_node[1]->data > data)
             {
-                BTreeNode *upper_child_node = NULL;
-                while (child_node->LeftNode != NULL)
-                {
-                    upper_child_node = child_node;
-                    child_node = child_node->LeftNode;
-                }
-
-                upper_child_node->LeftNode = child_node->RightNode;
-                free(del);
-                break;
+                root_node[0] = root_node[1];
+                root_node[1] = root_node[1]->LeftNode;
+            }
+            else if (root_node[1]->data < data)
+            {
+                root_node[0] = root_node[1];
+                root_node[1] = root_node[1]->RightNode;
             }
             else
             {
-                if (root_node->data > data)
+                if ((root_node[1]->RightNode == NULL) && (root_node[1]->LeftNode == NULL))
                 {
-                    root_node->LeftNode = child_node->RightNode;
-                    free(del);
+                    leaf_node = root_node[1];
+                    break;
+                }
+                else if ((root_node[1]->LeftNode == NULL) || (root_node[1]->RightNode == NULL))
+                {
+                    if (root_node[0]->data > data)
+                    {
+                        if (root_node[1]->LeftNode == NULL)
+                        {
+                            root_node[0]->LeftNode = root_node[1]->RightNode;
+                        }
+                        else
+                        {
+                            root_node[0]->LeftNode = root_node[1]->LeftNode;
+                        }
+                    }
+                    else
+                    {
+                        if (root_node[1]->LeftNode == NULL)
+                        {
+                            root_node[0]->RightNode = root_node[1]->RightNode;
+                        }
+                        else
+                        {
+                            root_node[0]->RightNode = root_node[1]->LeftNode;
+                        }
+                    }
+
+                    leaf_node = root_node[1];
                     break;
                 }
                 else
                 {
-                    root_node->RightNode = child_node->RightNode;
-                    free(del);
+                    leaf_node = root_node[1]->RightNode;
+                    while (leaf_node->LeftNode != NULL)
+                    {
+                        if (leaf_node->LeftNode->LeftNode == NULL)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            leaf_node = leaf_node->LeftNode;
+                        }
+                    }
+
+                    if (root_node[0] != NULL)
+                    {
+                        if (root_node[0]->data > data)
+                        {
+                            leaf_node->LeftNode = root_node[1]->LeftNode;
+                            root_node[0]->LeftNode = leaf_node;
+
+                            leaf_node = root_node[1];
+                        }
+                        else
+                        {
+                            leaf_node->LeftNode = root_node[1]->LeftNode;
+                            root_node[0]->RightNode = leaf_node;
+                            leaf_node = root_node[1];
+                        }
+                    }
+                    else
+                    {
+
+                        if (root_node[1]->RightNode != NULL)
+                        {
+                            tree_root->Root = root_node[1]->LeftNode;
+                            leaf_node->LeftNode = root_node[1]->LeftNode;
+                            leaf_node->RightNode = root_node[1]->RightNode;
+                            leaf_node = root_node[1];
+                        }
+                        else
+                        {
+                            leaf_node->LeftNode = root_node[1]->LeftNode;
+                            leaf_node = root_node[1];
+                        }
+                    }
+
                     break;
                 }
             }
         }
+        else
+        {
+            return 1;
+        }
     }
+
+    free(leaf_node);
 
     return 0;
 }
